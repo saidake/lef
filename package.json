@@ -1,0 +1,32 @@
+{
+  "name": "lef",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "lef": "./bin/lef.js"
+  },
+  "keywords": [
+    "lef"
+  ],
+  "author": "saidake",
+  "homepage": "https://github.com/saidake/lef#readme",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^4.1.1",
+    "commander": "^7.2.0",
+    "cross-spawn": "^7.0.3",
+    "download": "^8.0.0",
+    "download-git-repo": "^3.0.2",
+    "envinfo": "^7.8.1",
+    "https": "^1.0.0",
+    "hyperquest": "^2.1.3",
+    "ora": "^5.4.0",
+    "prompts": "^2.4.1",
+    "semver": "^7.3.5",
+    "tar-pack": "^3.4.1",
+    "tmp": "^0.2.1",
+    "url": "^0.11.0",
+    "validate-npm-package-name": "^3.0.0"
+  }
+}
