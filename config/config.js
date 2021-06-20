@@ -1,4 +1,4 @@
 module.exports = {
-  originalpath: 'github:saidake/lef-react#original_1.0.0',
-  tspath: 'github:saidake/lef-react#ts_1.0.0',
+  originalpath: 'https://github.com/saidake/lef-react.git#original_1.0.0',
+  tspath: 'https://github.com/saidake/lef-react.git#ts_1.0.0',
 };

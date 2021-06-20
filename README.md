@@ -1,26 +1,26 @@
-## this package can create a simple webpack project for beginner to study.
+## this package can create a react webpack project.
 
 the package will add more additional project.
 
-## **Create your project in the current directory**,
-
-## Use  `npx `   to create a react webpack project :
+## install lef:
 
 ```
-npx lef my-app
+npm install -g lef
+```
+
+## **Create your project in the current directory**,
+
+## Use  `lef`   to create a react webpack project :
+
+```
+lef my-app
 ```
 
 ## create a typescript react webpack project :
 
 ```
-npx lef my-app -t 
-or:  npx lef my-app --typescript
-```
-
-## install  `npx`
-
-```
-npm i -g npx
+lef my-app -t 
+lef my-app --typescript
 ```
 
 #### help document :
@@ -46,3 +46,5 @@ lef --info
 ```
 lef --env
 ```
+
+TIPS：If the download fails, please try again once or twice. This network problem is being fixed.

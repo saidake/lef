@@ -120,7 +120,7 @@ function init() {
     }
     //checkpath
     let realpath=isTypeScript?tspath:originalpath;
-    download(`${realpath}`, targetPath, { clone: true }, (err) => {
+    download(`direct:${realpath}`, targetPath, { clone: true }, (err) => {
       if (err) {
         spinner.fail(chalk.red('faield to create project.'));
         process.exit(1);
