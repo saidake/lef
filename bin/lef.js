@@ -33,7 +33,7 @@ spinner.text = "Loading rainbows";
 // input projectname
 let projectName;
 //project dependencies to check projectName
-const PROJECT_DEPENDENCIES = ["react", "react-dom", "react-scripts"];
+const PROJECT_DEPENDENCIES = ["@saidake/lef-install"];
 const VALID_FILES = [
   ".DS_Store",
   ".git",
@@ -107,7 +107,7 @@ function init() {
             "Firefox",
             "Safari",
           ],
-          // npmPackages: ['react', 'react-dom', 'react-scripts'],
+          // npmPackages: ["@saidake/lef-install"],
           // npmGlobalPackages: ['lef'],
         },
         {
@@ -198,7 +198,7 @@ function createProject(projectName, isTypeScript) {
   }
 
   console.log();
-  console.log(`Creating a new React app in ${chalk.green(projectRootDir)}.`);
+  console.log(`Creating a new Lef Project in ${chalk.green(projectRootDir)}.`);
   console.log();
 
   // create package.json file--------------------||
