@@ -1,7 +1,5 @@
 ## this package can create a react webpack project.
 
-the package will add more additional project.
-
 ## install lef:
 
 ```
@@ -10,17 +8,10 @@ npm install -g lef
 
 ## **Create your project in the current directory**,
 
-## Use  `lef`   to create a react webpack project :
+## Use  `lef`   to create a typescript react webpack project :
 
 ```
 lef my-app
-```
-
-## create a typescript react webpack project :
-
-```
-lef my-app -t 
-lef my-app --typescript
 ```
 
 #### help document :
@@ -47,4 +38,4 @@ lef --info
 lef --env
 ```
 
-TIPS：If the download fails, please try again once or twice. This network problem is being fixed.
+TIPS：thanks for downloading.

@@ -310,10 +310,11 @@ async function downloadProjectFiles(
         init.apply(null, JSON.parse(process.argv[1]));
       `
       );
+      console.log(chalk.yellow("\nThe lef project created successfully!"));
       process.exit(1);
     })
     .catch(() => {
-      console.log("\nlef project createion failed............");
+      console.log(chalk.red("\nThe lef project creation failed! "));
       process.exit(1);
     });
 }
@@ -604,53 +605,6 @@ function checkForLatestVersion() {
       .on("error", () => {
         reject();
       });
-  });
-}
-
-function downloaduser() {
-  //input projectName
-  const targetPath = path.resolve(projectName);
-  //app name
-  let appName = path.basename(targetPath);
-  let isTypeScript = false;
-
-  console.log(`creating a new project in ${chalk.white(targetPath)}`);
-
-  spinner.start(chalk.yellow("creating project........"));
-
-  //check the project folder
-  if (fs.existsSync(targetPath)) {
-    console.log(chalk.red("\nThis directory already exists"));
-    console.log(chalk.red("For security, you can delete it manually"));
-    process.exit(1);
-  }
-  fs.mkdir(targetPath, { recursive: true }, (err) => {
-    if (err) {
-      console.log(chalk.red("failed to create project directory"));
-      process.exit(1);
-    }
-    //checkpath
-    let realpath = isTypeScript ? tspath : originalpath;
-    download(`direct:${realpath}`, targetPath, { clone: true }, (err) => {
-      if (err) {
-        spinner.fail(chalk.red("faield to create project."));
-        process.exit(1);
-      }
-      //change created project name
-      let packPath = `${targetPath}/package.json`;
-      let resultPkg = require(packPath);
-      resultPkg["name"] = appName;
-      if (fs.existsSync(packPath)) {
-        fs.unlinkSync(packPath);
-      }
-      fs.writeFile(packPath, JSON.stringify(resultPkg, null, 2), (err) => {
-        if (err) {
-          chalk.red("change the package name failed");
-        }
-      });
-
-      spinner.succeed(chalk.white("project has been created."));
-    });
   });
 }
 
