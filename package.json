@@ -1,6 +1,6 @@
 {
   "name": "lef",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -9,6 +9,9 @@
   "keywords": [
     "lef"
   ],
+  "bugs": {
+    "url": "https://github.com/saidake/lef/issues"
+  },
   "author": "saidake@qq.com",
   "homepage": "https://github.com/saidake/lef#readme",
   "license": "ISC",
