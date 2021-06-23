@@ -13,14 +13,14 @@ const spinner = ora("creating");
 
 // other package
 const https = require("https");
-const dns = require("dns");
+// const dns = require("dns");
 const execSync = require("child_process").execSync;
-const hyperquest = require("hyperquest");
-const prompts = require("prompts");
+// const hyperquest = require("hyperquest");
+// const prompts = require("prompts");
 const semver = require("semver");
-const tmp = require("tmp");
-const unpack = require("tar-pack").unpack;
-const url = require("url");
+// const tmp = require("tmp");
+// const unpack = require("tar-pack").unpack;
+// const url = require("url");
 const validateProjectName = require("validate-npm-package-name");
 
 // variable
@@ -191,7 +191,7 @@ function createProject(projectName, isTypeScript) {
 
   // validate projectName--------------------||
   checkProjectName(projectName);
-  //创建的目录  路径
+  // ==========================================================================result path
   const resultPath = fs.ensureDirSync(projectName);
   if (!isSafeToCreateProjectIn(projectRootDir, projectName)) {
     process.exit(1);
@@ -208,11 +208,11 @@ function createProject(projectName, isTypeScript) {
     private: true,
   };
 
-  //使用时开启 ，写入package.json文件
-  // fs.writeFileSync(
-  //   path.join(projectRootDir, 'package.json'),
-  //   JSON.stringify(packageJson, null, 2) + os.EOL
-  // );
+  // create package.json to new dir
+  fs.writeFileSync(
+    path.join(projectRootDir, 'package.json'),
+    JSON.stringify(packageJson, null, 2) + os.EOL
+  );
   const hasYarn = checkHasYarn();
 
   const originalProcessDirectory = process.cwd();
@@ -227,7 +227,6 @@ function createProject(projectName, isTypeScript) {
   // check npm and yarn's version --------------------||
   if (!hasYarn) {
     const npmInfo = checkNpmVersion();
-    console.log("npmInfo: ", npmInfo);
     if (npmInfo.hasMinNpm) {
       console.log(
         chalk.yellow(
@@ -266,15 +265,7 @@ function createProject(projectName, isTypeScript) {
       yarnUsesDefaultRegistry =
         execSync("yarnpkg config get registry").toString().trim() ===
         "https://registry.yarnpkg.com";
-    } catch (e) {
-      // ignore
-    }
-    if (yarnUsesDefaultRegistry) {
-      // fs.copySync(
-      //   require.resolve('./yarn.lock.cached'),
-      //   path.join(projectRootDir, 'yarn.lock')
-      // );
-    }
+    } catch (e) {}
   }
 
   // download project--------------------||
@@ -287,17 +278,113 @@ function createProject(projectName, isTypeScript) {
   );
 }
 
-
 // -----------------------------------------------downloadProjectFiles-----------------------------------------------//
-function downloadProjectFiles(projectRootDir,projectName,originalProcessDirectory,hasYarn,isTypeScript){
-    let packageToInstall='fsfsfs'; 
-    const allDependencies = ['react', 'react-dom', packageToInstall];
-    console.log('Installing packages. This might take a couple of minutes.');
-    
-    //need to config packageurl
-    // getInstallPackage(originalProcessDirectory)
+async function downloadProjectFiles(
+  projectRootDir,
+  projectName,
+  originalProcessDirectory,
+  hasYarn,
+  isTypeScript
+) {
+  console.log("Installing packages. This might take a couple of minutes.");
+
+  
+  // install two package--------------------||
+  install(
+    projectRootDir,
+    hasYarn,
+    ["@saidake/lef-react-typescript", "@saidake/lef-install"],
+    true
+  )
+    .then(async () => {
+      const packageName='@saidake/lef-install';
+      const templatePackageName="lef-react-typescript";
+      await executeNodeScript(
+        {
+          currentPath: process.cwd(),
+          args: [],
+        },
+        [projectRootDir, projectName, hasYarn,templatePackageName,originalProcessDirectory],
+        `
+        var init = require('${packageName}/init.js');
+        init.apply(null, JSON.parse(process.argv[1]));
+      `
+      );
+      process.exit(1);
+    })
+    .catch(() => {
+      console.log("\nlef project createion failed............");
+      process.exit(1);
+    });
 }
 
+// -----------------------------------------------execute lef-install scripts-----------------------------------------------//
+function executeNodeScript({ currentPath, args }, dataArray, execScript) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(
+      process.execPath,
+      [...args, "-e", execScript, "--", JSON.stringify(dataArray)],
+      { currentPath, stdio: "inherit" }
+    );
+
+    child.on("close", (code) => {
+      if (code !== 0) {
+        reject({
+          command: `node ${args.join(" ")}`,
+        });
+        return;
+      }
+      resolve();
+    });
+  });
+}
+// -----------------------------------------------download template and scripts-----------------------------------------------//
+function install(projectRootDir,hasYarn, dependencies, isOnline) {
+  return new Promise((resolve, reject) => {
+
+    let command;
+    let args;
+    if (hasYarn) {
+
+      command = "yarnpkg";
+      args = ["add", "--exact"];
+      if (!isOnline) {
+        args.push("--offline");
+      }
+
+      [].push.apply(args, dependencies);
+      args.push("--cwd");
+      args.push(projectRootDir);
+
+
+
+      if (!isOnline) {
+        console.log(chalk.yellow("You appear to be offline."));
+        console.log(chalk.yellow("Falling back to the local Yarn cache."));
+        console.log();
+      }
+    } else {
+      command = "npm";
+      args = [
+        "install",
+        "--save",
+        "--save-exact",
+        "--loglevel",
+        "error",
+      ].concat(dependencies);
+    }
+    const child = spawn(command, args, { stdio: "inherit" });
+    child.on("close", (code) => {
+      if (code !== 0) {
+        reject({
+          command: `${command} ${args.join(" ")}`,
+        });
+        return;
+      }
+      resolve();
+    });
+  });
+}
 
 // -----------------------------------------------check yarn version-----------------------------------------------//
 function checkYarnVersion() {

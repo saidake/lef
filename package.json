@@ -9,10 +9,12 @@
   "keywords": [
     "lef"
   ],
-  "author": "saidake",
+  "author": "saidake@qq.com",
   "homepage": "https://github.com/saidake/lef#readme",
   "license": "ISC",
   "dependencies": {
+    "@saidake/lef-install": "1.0.0",
+    "@saidake/lef-react-typescript": "1.0.0",
     "chalk": "^4.1.1",
     "commander": "^7.2.0",
     "cross-spawn": "^7.0.3",
