@@ -1,6 +1,5 @@
 "use strict";
 
-const download = require("download-git-repo");
 const envinfo = require("envinfo");
 const chalk = require("chalk");
 const path = require("path");
