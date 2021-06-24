@@ -25,13 +25,21 @@ const validateProjectName = require("validate-npm-package-name");
 
 // variable
 const packageJson = require("../package.json");
-const { tspath, originalpath } = require("../config/config");
 
 spinner.color = "yellow";
 spinner.text = "Loading rainbows";
 
 // input projectname
 let projectName;
+
+//project dependencies package
+const PROJECT_TOOL={
+  reactDefault:"@saidake/lef-react-default",
+  reactTypescript:"@saidake/lef-react-typescript", 
+  installTool:"@saidake/lef-install"
+}
+
+
 //project dependencies to check projectName
 const PROJECT_DEPENDENCIES = ["@saidake/lef-install"];
 const VALID_FILES = [
@@ -287,18 +295,24 @@ async function downloadProjectFiles(
   isTypeScript
 ) {
   console.log("Installing packages. This might take a couple of minutes.");
+  
+  // important change-------------------------------------------------------------------------start
+  const installPackageName=PROJECT_TOOL.installTool;
+  const templatePackageName=PROJECT_TOOL.reactDefault;
 
+  if(isTypeScript){
+    templatePackageName=PROJECT_TOOL.reactTypescript
+  }
+  // important change-------------------------------------------------------------------------end
   
   // install two package--------------------||
   install(
     projectRootDir,
     hasYarn,
-    ["@saidake/lef-react-typescript", "@saidake/lef-install"],
+    [templatePackageName, installPackageName],
     true
   )
     .then(async () => {
-      const packageName='@saidake/lef-install';
-      const templatePackageName="lef-react-typescript";
       await executeNodeScript(
         {
           currentPath: process.cwd(),
@@ -306,7 +320,7 @@ async function downloadProjectFiles(
         },
         [projectRootDir, projectName, hasYarn,templatePackageName,originalProcessDirectory],
         `
-        var init = require('${packageName}/init.js');
+        var init = require('${installPackageName}/init.js');
         init.apply(null, JSON.parse(process.argv[1]));
       `
       );
@@ -506,13 +520,13 @@ function checkHasYarn() {
 function isSafeToCreateProjectIn(projectRootDir, projectName) {
   const conflicts = fs
     .readdirSync(projectRootDir)
-    .filter((file) => !VALID_FILES.includes(file)) //去除特定的文件
+    .filter((file) => !VALID_FILES.includes(file)) 
     // IntelliJ IDEA creates module files before CRA is launched
     .filter((file) => !/\.iml$/.test(file))
     // Don't treat log files from previous installation as conflicts
     .filter(
       (file) => !ERROR_FILE_PATTERNS.some((pattern) => file.startsWith(pattern))
-    ); //去除以日志符号开头的文件
+    );
 
   if (conflicts.length > 0) {
     console.log(
