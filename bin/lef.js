@@ -212,6 +212,18 @@ function createProject(projectName, isTypeScript) {
   console.log();
 
   // ===========================================创建package.json文件
+  // create package.json file--------------------||
+  const packageJson = {
+    name: projectName,
+    version: "0.1.0",
+    private: true,
+  };
+
+  // create package.json to new dir
+  fs.writeFileSync(
+    path.join(projectRootDir, 'package.json'),
+    JSON.stringify(packageJson, null, 2) + os.EOL
+  );
 
   const hasYarn = checkHasYarn();
 
@@ -291,8 +303,7 @@ async function downloadProjectFiles(
   install(
     projectRootDir,
     hasYarn,
-    // [templatePackageName, installPackageName],  //暂时不下载
-    [templatePackageName],
+    [templatePackageName, installPackageName], 
     true
   )
     .then(async () => {
@@ -308,7 +319,8 @@ async function downloadProjectFiles(
         init.apply(null, JSON.parse(process.argv[1]));
       `
       );
-      console.log(chalk.yellow("\nThe lef project created successfully!"));
+      let downloadTool=hasYarn?"yarn":"npm";
+      console.log(chalk.yellow(`\nThe lef project created successfully!, use '${downloadTool} install' to install dependencies.`));
       process.exit(1);
     })
     .catch(() => {
