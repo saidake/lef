@@ -1,5 +1,5 @@
 "use strict";
-
+// -----------------------------------------------依赖-----------------------------------------------//
 const envinfo = require("envinfo");
 const chalk = require("chalk");
 const path = require("path");
@@ -10,7 +10,7 @@ const commander = require("commander");
 const fs = require("fs-extra");
 const spinner = ora("creating");
 
-// other package
+// 其他包
 const https = require("https");
 // const dns = require("dns");
 const execSync = require("child_process").execSync;
@@ -22,12 +22,13 @@ const semver = require("semver");
 // const url = require("url");
 const validateProjectName = require("validate-npm-package-name");
 
-// variable
 const packageJson = require("../package.json");
 
+// -----------------------------------------------spinner设置-----------------------------------------------//
 spinner.color = "yellow";
 spinner.text = "Loading rainbows";
 
+// -----------------------------------------------常量-----------------------------------------------//
 // input projectname
 let projectName;
 
@@ -67,9 +68,9 @@ const ERROR_FILE_PATTERNS = [
   "yarn-debug.log",
 ];
 
-// -----------------------------------------------init program-----------------------------------------------//
+// -----------------------------------------------初始化程序-----------------------------------------------//
 function init() {
-  // config command--------------------||
+  // ===========================================配置lef 命令
   const program = new commander.Command(packageJson.name)
     .version(packageJson.version, "-v,--version", "print version number")
     .arguments("[project-name]")
@@ -98,7 +99,7 @@ function init() {
       process.exit(1);
     })
     .parse(process.argv);
-  // check input env options--------------------||
+    // ===========================================检查本地环境
   if (program.opts().env) {
     console.log(chalk.bold("\nEnvironment Info:"));
     console.log(`  running from ${__dirname}`);
@@ -125,7 +126,7 @@ function init() {
       .then(console.log);
   }
 
-  // check project name--------------------||
+  // ===========================================检查创建的项目名
   if (typeof projectName === "undefined") {
     console.log(chalk.white("Please specify the project name, "));
     console.log(
@@ -180,9 +181,12 @@ function init() {
     });
 }
 
-// -----------------------------------------------create lef project-----------------------------------------------//
+
+
+
+// -----------------------------------------------开始创建项目-----------------------------------------------//
 function createProject(projectName, isTypeScript) {
-  // check node version--------------------||
+  // ===========================================检查node版本
   const supportedNodeVersion = semver.satisfies(process.version, ">=10");
   if (!supportedNodeVersion) {
     console.log(
@@ -196,9 +200,8 @@ function createProject(projectName, isTypeScript) {
 
   const projectRootDir = path.resolve(projectName);
 
-  // validate projectName--------------------||
+  // ===========================================检查项目名称是否合法
   checkProjectName(projectName);
-  // ==========================================================================result path
   const resultPath = fs.ensureDirSync(projectName);
   if (!isSafeToCreateProjectIn(projectRootDir, projectName)) {
     process.exit(1);
@@ -208,30 +211,14 @@ function createProject(projectName, isTypeScript) {
   console.log(`Creating a new Lef Project in ${chalk.green(projectRootDir)}.`);
   console.log();
 
-  // create package.json file--------------------||
-  const packageJson = {
-    name: projectName,
-    version: "0.1.0",
-    private: true,
-  };
+  // ===========================================创建package.json文件
 
-  // create package.json to new dir
-  fs.writeFileSync(
-    path.join(projectRootDir, 'package.json'),
-    JSON.stringify(packageJson, null, 2) + os.EOL
-  );
   const hasYarn = checkHasYarn();
 
   const originalProcessDirectory = process.cwd();
   process.chdir(projectRootDir);
 
-  // check npm command--------------------||
-  // if (!hasYarn && !checkThatNpmCanReadCwd()) {
-  //   process.exit(1);
-  // }
-  // pass the step,........  there is some problem...
-
-  // check npm and yarn's version --------------------||
+  // ===========================================检查npm 或者 yarn的版本
   if (!hasYarn) {
     const npmInfo = checkNpmVersion();
     if (npmInfo.hasMinNpm) {
@@ -265,7 +252,7 @@ function createProject(projectName, isTypeScript) {
     }
   }
 
-  // check yarn registry--------------------||
+  // ===========================================检查yarn 仓库地址
   if (hasYarn) {
     let yarnUsesDefaultRegistry = true;
     try {
@@ -275,7 +262,7 @@ function createProject(projectName, isTypeScript) {
     } catch (e) {}
   }
 
-  // download project--------------------||
+  // ===========================================开始下载项目
   downloadProjectFiles(
     projectRootDir,
     projectName,
@@ -285,7 +272,7 @@ function createProject(projectName, isTypeScript) {
   );
 }
 
-// -----------------------------------------------downloadProjectFiles-----------------------------------------------//
+// -----------------------------------------------下载项目文件-----------------------------------------------//
 async function downloadProjectFiles(
   projectRootDir,
   projectName,
@@ -295,20 +282,17 @@ async function downloadProjectFiles(
 ) {
   console.log("Installing packages. This might take a couple of minutes.");
   
-  // important change-------------------------------------------------------------------------start
-  const installPackageName=PROJECT_TOOL.installTool;
-  const templatePackageName=PROJECT_TOOL.reactDefault;
-
+  const installPackageName=PROJECT_TOOL.installTool;      //下载用的工具包   
+  const templatePackageName=PROJECT_TOOL.reactDefault;    //下载用的模板包（默认为reactDefault）
   if(isTypeScript){
-    templatePackageName=PROJECT_TOOL.reactTypescript
+    templatePackageName=PROJECT_TOOL.reactTypescript      //typescript模板
   }
-  // important change-------------------------------------------------------------------------end
-  
-  // install two package--------------------||
+  // ===========================================下载上方定义的两个工具包
   install(
     projectRootDir,
     hasYarn,
-    [templatePackageName, installPackageName],
+    // [templatePackageName, installPackageName],  //暂时不下载
+    [templatePackageName],
     true
   )
     .then(async () => {
@@ -318,6 +302,7 @@ async function downloadProjectFiles(
           args: [],
         },
         [projectRootDir, projectName, hasYarn,templatePackageName,originalProcessDirectory],
+        
         `
         var init = require('${installPackageName}/init.js');
         init.apply(null, JSON.parse(process.argv[1]));
@@ -352,7 +337,7 @@ function executeNodeScript({ currentPath, args }, dataArray, execScript) {
     });
   });
 }
-// -----------------------------------------------download template and scripts-----------------------------------------------//
+// -----------------------------------------------下载包-----------------------------------------------//
 function install(projectRootDir,hasYarn, dependencies, isOnline) {
   return new Promise((resolve, reject) => {
 
